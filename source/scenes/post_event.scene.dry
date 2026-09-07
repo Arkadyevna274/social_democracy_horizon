@@ -5647,6 +5647,10 @@ if (Q.year == 1928 && Q.month >= 2 && Q.strelitz_flavor_1 != 1) {
     lines.push("Total seats: " + totalSeatCheck + " / " + totalSeats);
 
     Q.strelitz_var_string = "<pre>" + lines.join("\n") + "</pre>";
+
+    if (Q.strelitz_party_r_spd >= 18 && Q.achievement_strelitz != 1) {
+        this.achieve('strelitz')
+    }
 }
 
 
