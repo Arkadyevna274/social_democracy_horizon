@@ -145,7 +145,7 @@ Q.democratization_disp = Q.democratization;
 Q.radicalization_disp = Q.radicalization;
 
 var partyNameOverrideIdeology = {
-    ddp: 'Q.ddp_name'
+    ddp: Q.ddp_name || 'DDP'
 };
 
 var partyNameOverrideRelations = {
