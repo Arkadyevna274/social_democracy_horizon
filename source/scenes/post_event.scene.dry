@@ -5555,17 +5555,28 @@ if (Q.year == 1928 && Q.month >= 1 && Q.bayernbund_flavor_1 != 1) {
 if (Q.year == 1928 && Q.month >= 2 && Q.strelitz_flavor_1 != 1) {
     Q.strelitz_flavor_1 = 1;
     Q.strelitz_spd = Q.workers_spd * 0.8;
-    Q.strelitz_dnvp = Q.old_middle_dnvp * 0.5 + Q.rural_dnvp * (Q.geest_wildfire >= 1 ? 0.1 : 0.2);
+    Q.strelitz_dnvp = Q.old_middle_dnvp * 0.3 + Q.rural_dnvp * (Q.geest_wildfire >= 1 ? 0.1 : 0.2);
     Q.strelitz_dvp = Q.dvp_pct * 0.1;
-    Q.strelitz_ddp = Q.ddp_pct * 0.3;
+    Q.strelitz_ddp = Q.ddp_pct * 0.5;
     Q.strelitz_kpd = Q.kpd_pct * 0.1;
-    Q.strelitz_vrp = Q.vrp_pct * 1.5;
-    Q.strelitz_act = Q.old_middle_other * 8;
-    Q.strelitz_dvfp = Q.old_middle_nsdap * 0.5;
+    Q.strelitz_vrp = Q.vrp_pct * 2;
+    Q.strelitz_act = Q.old_middle_other * 4;
+    Q.strelitz_dvfp = Q.old_middle_nsdap * 0.8;
 
     // --- normalize all strelitz_* values to sum to 100% ---
     var strelitzKeys = ["strelitz_spd", "strelitz_dnvp", "strelitz_dvp", "strelitz_ddp",
                          "strelitz_kpd", "strelitz_vrp", "strelitz_act", "strelitz_dvfp"];
+
+    var strelitzLabels = {
+        strelitz_spd:  "SPD",
+        strelitz_dnvp: "DNVP",
+        strelitz_dvp:  "DVP",
+        strelitz_ddp:  "DDP",
+        strelitz_kpd:  "KPD",
+        strelitz_vrp:  "Deflation List",
+        strelitz_act:  "Craft & Trade",
+        strelitz_dvfp: "DVFP"
+    };
 
     var strelitzTotal = 0;
     for (var i = 0; i < strelitzKeys.length; i++) {
@@ -5602,18 +5613,42 @@ if (Q.year == 1928 && Q.month >= 2 && Q.strelitz_flavor_1 != 1) {
         Q[seatKey] += 1;
     }
 
-    // --- combine into one variable list string ---
-    var strelitzVarList = [];
+    // --- build table string instead of flat var list ---
+    var col1 = "Party", col2 = "%", col3 = "Seats";
+    var rows = [];
     for (var i = 0; i < strelitzKeys.length; i++) {
         var key = strelitzKeys[i];
-        strelitzVarList.push(key + "_pct=" + Q[key + "_pct"].toFixed(2));
+        var seatKey = key.replace("strelitz_", "strelitz_party_r_");
+        rows.push([strelitzLabels[key], Q[key + "_pct"].toFixed(2) + "%", String(Q[seatKey])]);
     }
-    for (var i = 0; i < strelitzKeys.length; i++) {
-        var seatKey = strelitzKeys[i].replace("strelitz_", "strelitz_party_r_");
-        strelitzVarList.push(seatKey + "=" + Q[seatKey]);
+
+    var w1 = col1.length, w2 = col2.length, w3 = col3.length;
+    for (var i = 0; i < rows.length; i++) {
+        if (rows[i][0].length > w1) w1 = rows[i][0].length;
+        if (rows[i][1].length > w2) w2 = rows[i][1].length;
+        if (rows[i][2].length > w3) w3 = rows[i][2].length;
     }
-    Q.strelitz_var_string = strelitzVarList.join(";");
+
+    function padRight(s, w) { while (s.length < w) s += " "; return s; }
+    function padLeft(s, w) { while (s.length < w) s = " " + s; return s; }
+
+    var sep = "+-" + "-".repeat(w1) + "-+-" + "-".repeat(w2) + "-+-" + "-".repeat(w3) + "-+";
+    var lines = [];
+    lines.push(sep);
+    lines.push("| " + padRight(col1, w1) + " | " + padLeft(col2, w2) + " | " + padLeft(col3, w3) + " |");
+    lines.push(sep);
+    for (var i = 0; i < rows.length; i++) {
+        lines.push("| " + padRight(rows[i][0], w1) + " | " + padLeft(rows[i][1], w2) + " | " + padLeft(rows[i][2], w3) + " |");
+    }
+    lines.push(sep);
+
+    var totalSeatCheck = 0;
+    for (var i = 0; i < rows.length; i++) totalSeatCheck += parseInt(rows[i][2], 10);
+    lines.push("Total seats: " + totalSeatCheck + " / " + totalSeats);
+
+    Q.strelitz_var_string = lines.join("\n");
 }
+
 
 
 
