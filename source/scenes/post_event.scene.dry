@@ -5646,7 +5646,7 @@ if (Q.year == 1928 && Q.month >= 2 && Q.strelitz_flavor_1 != 1) {
     for (var i = 0; i < rows.length; i++) totalSeatCheck += parseInt(rows[i][2], 10);
     lines.push("Total seats: " + totalSeatCheck + " / " + totalSeats);
 
-    Q.strelitz_var_string = lines.join("\n");
+    Q.strelitz_var_string = "<pre>" + lines.join("\n") + "</pre>";
 }
 
 
