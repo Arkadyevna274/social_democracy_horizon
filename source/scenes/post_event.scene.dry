@@ -3508,12 +3508,12 @@ function computeTarget(party, c) {
            base *= _partyAdj('dnvp');
            base *= _campaignMult('dnvp', c);
 
-           let workers_m     = 0.20
+           let workers_m     = 0.10
                * (Q.peoples_party                      === 1 ? 1.10 : 1)
-               * (Q.lambach_reinstated && lambachEarly        ? 1.20 : 1)
-               * (Q.lambach_momentum   && lambachEarly        ? 1.40 : 1)
-               * (isLambach                                   ? 1.35 : 1.00)
-               * (isSocCorp                                   ? 1.40 : 1.00)
+               * (Q.lambach_reinstated && lambachEarly        ? 1.40 : 1)
+               * (Q.lambach_momentum   && lambachEarly        ? 1.50 : 1)
+               * (isLambach                                   ? 1.55 : 1.00)
+               * (isSocCorp                                   ? 1.60 : 1.00)
                * (isNatCon                                    ? 0.80 : 1.00);
            let old_middle_m  = 1.20 * (1 + Math.min(Q.nationalism/100,1)*0.28)
                * (Q.peoples_party                      === 1 ? 0.95 : 1)
@@ -3674,10 +3674,7 @@ function computeTarget(party, c) {
             if (Q.kpd_banned) return 0;
             let buff = Q.april_challenge === 1 ? 1.30 : 1;
 
-            // Behavior: revleft ('climb') — replaces the reactive
-            // unrest_soc_hybrid term with the slow-building revolutionary
-            // unrest stock. Scaled down (/20 vs the old term's ~0-1.5
-            // range) since the stock itself climbs to a cap of 20.
+
             const kpd_unrest_points = _tickRevolutionaryUnrest('kpd');
             base = soc * 6.8 * 1.9 * (1 + (kpd_unrest_points / 20) * 1.6) * buff * im.kpd;
             base *= _partyAdj('kpd');
@@ -3687,11 +3684,11 @@ function computeTarget(party, c) {
             base *= _govEconMult('kpd');
             base *= _campaignMult('kpd', c);
 
-            let workers_m     = 1.55 * (Q.peoples_party === 1 ? 1.08 : 1);
+            let workers_m     = 1.35 * (Q.peoples_party === 1 ? 1.08 : 1);
             let old_middle_m  = 0.05 * (Q.peoples_party === 1 ? 0.92 : 1);
             let new_middle_m  = 0.10 * (Q.peoples_party === 1 ? 0.92 : 1);
             let rural_m       = 0.10 * (Q.peoples_party === 1 ? 0.92 : 1);
-            let unemployedc_m = 1.40 * (Q.peoples_party === 1 ? 1.08 : 1);
+            let unemployedc_m = 1.55 * (Q.peoples_party === 1 ? 1.08 : 1);
             const class_mods  = { workers: workers_m, old_middle: old_middle_m, new_middle: new_middle_m, rural: rural_m, unemployedc: unemployedc_m };
             return _applyQOL(base * (class_mods[c] || 1.0) * _classAdj('kpd', c), party, c);
         }
@@ -3741,7 +3738,7 @@ function computeTarget(party, c) {
 
     if (Q.social_fascism_adopted == 1) {r *= 1.57; s *= 0.30}
 
-    let campaign_policy_boost = 0.55;
+    let campaign_policy_boost = 0.40;
     if (Q.campaign_focus_spd === 'workers'    && (Q.campaign_intensity_spd || 0) > 0) {
         campaign_policy_boost +=
               (Q.wtb_timer > 0 ? (Q.workers / 80) * 0.75 * 0.5 : 0)
@@ -3799,7 +3796,7 @@ function computeTarget(party, c) {
         ? 1 + (unrest_soc_hybrid * 0.045)
         : 1.0;
 
-    base = (r * 19.7 + s * 11.5) * im.spd * (eim.spd || 1.0) * campaign_policy_boost * left_extremism_bump;
+    base = (r * 20.7 + s * 11.5) * im.spd * (eim.spd || 1.0) * campaign_policy_boost * left_extremism_bump;
     base *= _partyAdj('spd');
 
     // Behavior: refleft ('linear') — reactive unrest term above is
@@ -3811,10 +3808,10 @@ function computeTarget(party, c) {
 
     let m;
     if (c === 'workers') {
-        m = 1.10;
-        if (Q.peoples_party === 1)  m *= 0.82;
-        if (Q.ideology === 'left')      m *= 1.12;
-        if (Q.ideology === 'reformist') m *= 0.92;
+        m = 1.20;
+        if (Q.peoples_party === 1)  m *= 0.75;
+        if (Q.ideology === 'left')      m *= 1.15;
+        if (Q.ideology === 'reformist') m *= 0.90;
         
         let workersDuesDiff = Q.dues_workers - 1;
         m *= workersDuesDiff > 0 ? (1 - workersDuesDiff * 0.086) : (1 - workersDuesDiff * 0.05);
@@ -3832,7 +3829,7 @@ function computeTarget(party, c) {
         if (Q.lower_tax_rates > 0)       m -= Q.lower_tax_rates * 0.25;
     } else if (c === 'old_middle') {
 
-        m = 0.15;
+        m = 0.10;
         if (Q.peoples_party === 1)   m *= 1.15;
         if (Q.ideology === 'left')       m *= 0.88;
         if (Q.ideology === 'reformist')  m *= 1.10;
@@ -3842,7 +3839,7 @@ function computeTarget(party, c) {
         m *= oldMiddleDuesDiff > 0 ? (1 - oldMiddleDuesDiff * 0.12) : (1 - oldMiddleDuesDiff * 0.07);
         if (Q.land_reform > 0)      m -= Q.land_reform     * 0.15;
     } else if (c === 'new_middle') {
-        m = 0.65;
+        m = 0.68;
         if (Q.peoples_party === 1)   m *= 1.15;
         if (Q.ideology === 'left')       m *= 0.88;
         if (Q.ideology === 'reformist')  m *= 1.10;
@@ -6742,7 +6739,10 @@ if (Q.lambach_stage == 1 && Q.flavor_lambach_1_dnvp != 1) {
 }
 
 // 4. Lambach Article Trigger
-if (((Q.year == 1928 && Q.month >= 6) || (Q.year == 1929 && Q.month <= 1)) && (Q.dnvp_pct < (Q.old_dnvp_r - 2.33) || Q.dnvp_pct < (Q.dnvp_r - 5) || Q.dnvp_pct < 16.3) && Q.lambach_flavor_trigger_1 != 1) {
+if (((Q.year == 1928 && Q.month >= 6) || (Q.year == 1929 && Q.month <= 1)) 
+    && (Q.dnvp_pct < (Q.old_dnvp_r - 2.33) || Q.dnvp_pct < (Q.dnvp_r - 5) || Q.dnvp_pct < 16.3) 
+    && Q.lambach_flavor_trigger_1 != 1 
+    && Q.lambach_flavor_2_trigger != 1) {
     Q.lambach_article_timer = 2;
     if (!Q.timers.includes('lambach_article')) {
         Q.timers.push('lambach_article');
@@ -6753,7 +6753,9 @@ if (((Q.year == 1928 && Q.month >= 6) || (Q.year == 1929 && Q.month <= 1)) && (Q
 // Lambach momentum
 
 // 5. Lambach Fallback / Christian Social Trigger
-if (Q.lambach_flavor_2_trigger != 1 && (Q.lambach_flavor_trigger_1 != 1 || (Q.year == 1928 && Q.month >= 8 && (Q.delegate_power_christsoc + Q.delegate_power_yocon) > 600))) {
+if (Q.lambach_flavor_2_trigger != 1 
+    && Q.lambach_flavor_trigger_1 != 1 
+    && Q.dnvp_party_0_congress_timer < 5) {
     Q.lambach_flavor_2_trigger = 1;
     Q.lambach_momentum_timer = 2;
     if (!Q.timers.includes('lambach_momentum')) {
