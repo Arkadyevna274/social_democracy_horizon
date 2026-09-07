@@ -4296,18 +4296,18 @@ function computeTarget(party, c) {
     case 'rlb': {
     if (Q.rlb_banned) return 0;
     let agrarian_crisis = Q.agri_price_collapse ? 1.5 : 1.0;
-    base = (nat * 7 + rep * 4) * (Q.rural / 60) * agrarian_crisis * im.dnvp;
+    base = (nat * 3 + rep * 3) * (Q.rural / 60) * agrarian_crisis * im.dnvp;
     base *= _partyAdj('rlb');
     base *= _campaignMult('rlb', c);
 
     const class_mods = {
         workers:     0.01,
-        old_middle:  0.10,
-        new_middle:  0.10,
-        rural:       2.15 * (1 + Math.min(Q.nationalism/100,1)*0.35)
+        old_middle:  0.30,
+        new_middle:  0.05,
+        rural:       2.20 * (1 + Math.min(Q.nationalism/100,1)*0.35)
                      * (Q.parties.includes('dbp') ? 0.95 : 1)
-                     * (Q.parties.includes('cnbl') ? 0.85 : 1),
-        unemployedc: 0.10,
+                     * (Q.parties.includes('cnbl') ? 0.80 : 1),
+        unemployedc: 0.01,
         };
     return _applyQOL(base * (class_mods[c] || 1.0) * _classAdj('rlb', c), party, c);
     }
