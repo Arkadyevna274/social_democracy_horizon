@@ -5555,7 +5555,7 @@ if (Q.year == 1928 && Q.month >= 1 && Q.bayernbund_flavor_1 != 1) {
 if (Q.year == 1928 && Q.month >= 2 && Q.strelitz_flavor_1 != 1) {
     Q.strelitz_flavor_1 = 1;
     Q.strelitz_spd = Q.workers_spd * 0.8;
-    Q.strelitz_dnvp = Q.old_middle_dnvp * 0.5 + Q.rural_dnvp * 0.2;
+    Q.strelitz_dnvp = Q.old_middle_dnvp * 0.5 + Q.rural_dnvp * (Q.geest_wildfire >= 1 ? 0.1 : 0.2);
     Q.strelitz_dvp = Q.dvp_pct * 0.1;
     Q.strelitz_ddp = Q.ddp_pct * 0.3;
     Q.strelitz_kpd = Q.kpd_pct * 0.1;
