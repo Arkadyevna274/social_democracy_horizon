@@ -7004,7 +7004,7 @@ Q.GLOBAL_PARTY_ACTIONS = {
         ignore: () => false,
         timer: 8,
         apply: () => {
-            Q.nationalism += 3;
+            Q.nationalism += 2;
         }
     },
 
@@ -7018,12 +7018,13 @@ Q.GLOBAL_PARTY_ACTIONS = {
             Q.prussian_republicanization -= 5;
             Q.prussian_police_loyalty -= 0.08;
             Q.prussian_police_strength += 30;
+            Q.nationalism += 1;
         }
     },
 
     prussian_rfb_ban: {
         ideoMin: 14, ideoMax: 20,
-        weight: () => 20.00,
+        weight: () => scaledWeight(4.00, Q.rfb_strength * Q.rfb_militancy, 500),
         description: (party) => partyLabel(party) + ' has prohibited the communist RFB paramilitary across Prussia, dealing a severe blow to left-wing militant organization in the state.',
         ignore: (party) => Q[party + '_in_government_prussia'] <= 0 || Q.rfb_banned >= 1,
         timer: 12,
@@ -7036,14 +7037,40 @@ Q.GLOBAL_PARTY_ACTIONS = {
 
     prussian_rb_ban: {
         ideoMin: 17, ideoMax: 20,
-        weight: () => 20.00,
+        weight: () => scaledWeight(4.00, Q.rb_strength * Q.rb_militancy, 500),
         description: (party) => partyLabel(party) + ' has issued a total ban on the Reichsbanner, citing the pro-republican paramilitary as too dangerous to permit its public activities.',
-        ignore: (party) => (Q[party + '_in_government_prussia'] <= 0 || Q.rb_banned >= 1) && (Q.rb_strength * Q.rb_militancy < 500),
+        ignore: (party) => Q[party + '_in_government_prussia'] <= 0 || Q.rb_banned >= 1,
         timer: 12,
         apply: () => {
             Q.rb_banned = 1;
             Q.rb_strength -= 100;
             Q.rb_militancy *= 0.90;
+        }
+    },
+
+    prussian_stahlhelm_ban: {
+        ideoMin: 1, ideoMax: 5,
+        weight: () => scaledWeight(4.00, Q.stahlhelm_strength * Q.stahlhelm_militancy, 500),
+        description: (party) => partyLabel(party) + ' has banned Der Stahlhelm across Prussia, moving to suppress the nationalist paramilitary\'s activities in the state.',
+        ignore: (party) => Q[party + '_in_government_prussia'] <= 0 || Q.sh_banned >= 1,
+        timer: 12,
+        apply: () => {
+            Q.sh_banned = 1;
+            Q.stahlhelm_strength -= 50;
+            Q.stahlhelm_militancy *= 0.95;
+        }
+    },
+
+    prussian_sa_ban: {
+        ideoMin: 1, ideoMax: 11,
+        weight: () => scaledWeight(4.00, Q.sa_strength * Q.sa_militancy, 500),
+        description: (party) => partyLabel(party) + ' has banned the SA across Prussia, striking at the Nazi paramilitary\'s ability to organize in the state.',
+        ignore: (party) => Q[party + '_in_government_prussia'] <= 0 || Q.sa_banned >= 1,
+        timer: 12,
+        apply: () => {
+            Q.sa_banned = 1;
+            Q.sa_strength -= 100;
+            Q.sa_militancy *= 0.90;
         }
     },
 
@@ -7072,7 +7099,7 @@ Q.GLOBAL_PARTY_ACTIONS = {
     campaigning: {
         ideoMin: 1, ideoMax: 20,
         weight: (party) => {
-            var oldR = Q[party + '_old_r'];
+            var oldR = Q['old_' + party + '_r'];
             var pct  = Q[party + '_pct'];
             if (!oldR || oldR <= 0) return 0;
             var shortfall = Math.max(0, oldR - pct); // 0 if not underperforming
