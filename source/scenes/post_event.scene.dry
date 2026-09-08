@@ -3900,7 +3900,7 @@ function computeTarget(party, c) {
            if (!Q.ddp_name || Q.ddp_name === 'DDP') {
                let sec_bonus = (100 - Q.catholics) / 100 * 0.10;
                let nat_pen   = (Q.nationalism / 100) * 0.15;
-               base = (rep * 9.4 * (1.1 + sec_bonus - nat_pen + edu_bonus)) * im.ddp;
+               base = (rep * 7.6 * (1.1 + sec_bonus - nat_pen + edu_bonus)) * im.ddp;
                base *= _partyAdj('ddp');
                base *= _govEconMult('ddp'); // Behavior: center
                base *= _campaignMult('ddp', c);
@@ -3980,7 +3980,7 @@ function computeTarget(party, c) {
             let cath_bonus  = Q.catholics / 8;
             let leader_mod  = Q.z_party_leader === 'Kaas' ? 0.94 : Q.z_party_leader === 'Joos' ? 1.06 : 1.0;
             let gov_mod     = Q.z_in_government ? 1.12 : 0.93;
-            base = (rep * 9 + cath_bonus * 0.8) * leader_mod * gov_mod * im.z * (eim.z || 1.0);
+            base = (rep * 6.5 + cath_bonus * 3.4) * leader_mod * gov_mod * im.z * (eim.z || 1.0);
 
             let floor = cath_bonus * 1.5 * gov_mod;
             base = Math.max(base, floor);
@@ -4025,9 +4025,9 @@ function computeTarget(party, c) {
 
         case 'bvp': {
             if (Q.bvp_banned) return 0;
-            let cath = Q.catholics * 0.10;
+            let cath = Q.catholics * 0.20;
             let rur  = Q.rural    * 0.03;
-            base = Math.min(9, rep * 3 * (nat * 4.4) * im.bvp + cath + rur);
+            base = Math.min(9, rep * 2.01 * (nat * 3.1) * im.bvp + cath + rur);
             base *= _partyAdj('bvp');
             base *= _campaignMult('bvp', c);
 
