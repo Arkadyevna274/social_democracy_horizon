@@ -7,21 +7,22 @@ view-if: year = 1928 and month = 2
 on-arrival: {!
 Q.marx_collapse_points = 0;
 
-if (Q.spd_votes_display >= 28.7) Q.marx_collapse_points += 1;
+if (Q.spd_votes_display >= 25.7) Q.marx_collapse_points += 1;
 if (Q.ideology === "reformist") Q.marx_collapse_points += 1;
 if (Q.ideology === "left") Q.marx_collapse_points -= 1;
-if (Q.prussian_concordat_progress >= 1) Q.marx_collapse_points += 1;
+if (Q.prussian_concordat_progress <= 0) Q.marx_collapse_points += 1;
 if (Q.geest_wildfire >= 1) Q.marx_collapse_points += 1;
-if (Q.z_relation >= 60) Q.marx_collapse_points += 1;
-if (Q.z_relation >= 70) Q.marx_collapse_points += 1;
+if (Q.z_relation >= 50) Q.marx_collapse_points += 1;
+if (Q.z_relation >= 65) Q.marx_collapse_points += 1;
 if (Q.republican_rally > 0) Q.marx_collapse_points += 1;
 if (Q.dvp_relation > 45) Q.marx_collapse_points += 1;
 if (Q.dnvp_votes_display >= 19) Q.marx_collapse_points += 1;
 if (Q.dnvp_votes_display <= 17) Q.marx_collapse_points -= 1;
-if (Q.z_votes_display >= 15) Q.marx_collapse_points += 1;
-if (Q.dvp_votes_display < 8) Q.marx_collapse_points += 1; 
+if (Q.z_pct >= 15) Q.marx_collapse_points += 1;
+if (Q.dvp_pct < 8.5) Q.marx_collapse_points += 1; 
+if (Q.dnvp_pct + Q.dvp_pct + Q.z_pct + Q.bvp_pct <= 50) Q.marx_collapse_points += 1; 
 
-let dvp = Q.dvp_votes_display;
+let dvp = Q.dvp_pct;
 
 // Calculate dynamic grand (g) and bourgeois (b) coalition weights for DVP
 let g = dvp * (Q.dvp_relation > 45 ? 1.2 : 0.8) * (Q.prussian_concordat_progress >= 1 ? 0.75 : 1.1) * (dvp >= 8 ? 1.0 : 1.3);
@@ -63,9 +64,9 @@ new-page: true
 
 = Marx's Cabinet survives confessional controversy! 
 
-Against all odds, the fourth Marx cabinet has weathered the confessional storm. The Reich School Law has been shelved indefinitely.
+Against all odds, the fourth Marx cabinet has weathered the confessional storm. The Reich School Law has been shelved indefinitely by assistance of Wilhelm Marx of Zentrum and Gustav Stresemann of DVP, who have managed to force compromise and have their respective parties accept it. DNVP's role as negotiator has also helped this.
 
-For now, the right-wing block maintains its grip on the machinery of the Reich. We must continue to build our strength from the opposition benches and wait for the natural expiration of the legislative term.
+For now, the right-wing block maintains its grip on the government, however current trend shows right wing is slowly losing all the votes...
 
 @marx_replaced
 new-page: true
