@@ -666,29 +666,33 @@ go-to: party_spy
 
 @dsbp
 view-if: dsbp_unlocked_spy >= 1
-subtitle: The internal situation of DSBP is a coalition of six distinct currents fused into one movement.
+subtitle: The internal situation of DSBP is a coalition of seven distinct currents fused into one movement.
 on-arrival: {!
 
 Q.dsbp_left_democrats = Q.dsbp_left_democrats || 0;
-Q.dsbp_centrists = Q.dsbp_centrists || 0;
+Q.dsbp_centre_left = Q.dsbp_centre_left || 0;
+Q.dsbp_centre_right = Q.dsbp_centre_right || 0;
 Q.dsbp_nationalists = Q.dsbp_nationalists || 0;
 Q.dsbp_young_germans = Q.dsbp_young_germans || 0;
 Q.dsbp_christian_unions = Q.dsbp_christian_unions || 0;
 Q.dsbp_liberal_clubs = Q.dsbp_liberal_clubs || 0;
 
-var total = Math.max(Q.dsbp_left_democrats, 0) + Math.max(Q.dsbp_centrists, 0) +
-            Math.max(Q.dsbp_nationalists, 0) + Math.max(Q.dsbp_young_germans, 0) +
-            Math.max(Q.dsbp_christian_unions, 0) + Math.max(Q.dsbp_liberal_clubs, 0);
+var total = Math.max(Q.dsbp_left_democrats, 0) + Math.max(Q.dsbp_centre_left, 0) +
+            Math.max(Q.dsbp_centre_right, 0) + Math.max(Q.dsbp_nationalists, 0) +
+            Math.max(Q.dsbp_young_germans, 0) + Math.max(Q.dsbp_christian_unions, 0) +
+            Math.max(Q.dsbp_liberal_clubs, 0);
 
 Q.dsbp_left_disp = Math.round(Q.dsbp_left_democrats);
-Q.dsbp_centrists_disp = Math.round(Q.dsbp_centrists);
+Q.dsbp_centreleft_disp = Math.round(Q.dsbp_centre_left);
+Q.dsbp_centreright_disp = Math.round(Q.dsbp_centre_right);
 Q.dsbp_nat_disp = Math.round(Q.dsbp_nationalists);
 Q.dsbp_young_disp = Math.round(Q.dsbp_young_germans);
 Q.dsbp_christian_disp = Math.round(Q.dsbp_christian_unions);
 Q.dsbp_liberal_disp = Math.round(Q.dsbp_liberal_clubs);
 
 Q.dsbp_left_pct = total > 0 ? (Math.max(Q.dsbp_left_democrats, 0) / total * 100).toFixed(1) : "0.0";
-Q.dsbp_centrists_pct = total > 0 ? (Math.max(Q.dsbp_centrists, 0) / total * 100).toFixed(1) : "0.0";
+Q.dsbp_centreleft_pct = total > 0 ? (Math.max(Q.dsbp_centre_left, 0) / total * 100).toFixed(1) : "0.0";
+Q.dsbp_centreright_pct = total > 0 ? (Math.max(Q.dsbp_centre_right, 0) / total * 100).toFixed(1) : "0.0";
 Q.dsbp_nat_pct = total > 0 ? (Math.max(Q.dsbp_nationalists, 0) / total * 100).toFixed(1) : "0.0";
 Q.dsbp_young_pct = total > 0 ? (Math.max(Q.dsbp_young_germans, 0) / total * 100).toFixed(1) : "0.0";
 Q.dsbp_christian_pct = total > 0 ? (Math.max(Q.dsbp_christian_unions, 0) / total * 100).toFixed(1) : "0.0";
@@ -702,15 +706,17 @@ var isDark = document.body.classList.contains('dark-mode');
 var factionData = [
     { id: "leftdem", name: "Left Democrats", subtitle: "Social-Republican Line",
       raw: Math.max(Q.dsbp_left_democrats, 0), color: isDark ? "#9a9bff" : "#595BFF" },
-    { id: "centrists", name: "Centrists", subtitle: "Zentrum / Cross-Party Fusion",
-      raw: Math.max(Q.dsbp_centrists, 0), color: isDark ? "#c9a86a" : "#5c4a1e" },
-    { id: "nationalists", name: "Nationalists", subtitle: "National-Conservative Current",
+    { id: "centreleft", name: "Centre Left", subtitle: "DDP Business Wing / Left-Liberals",
+      raw: Math.max(Q.dsbp_centre_left, 0), color: isDark ? "#7fbf94" : "#4a7c59" },
+    { id: "centreright", name: "Centre Right", subtitle: "Stresemannite National Liberals",
+      raw: Math.max(Q.dsbp_centre_right, 0), color: isDark ? "#69A2BE" : "#3f7bc1" },
+    { id: "nationalists", name: "Nationalists", subtitle: "Nationalists / Right",
       raw: Math.max(Q.dsbp_nationalists, 0), color: isDark ? "#e0824a" : "#8a3b12" },
     { id: "younggermans", name: "Young Germans", subtitle: "Jungdo-Aligned Bloc",
-      raw: Math.max(Q.dsbp_young_germans, 0), color: isDark ? "#7fbf94" : "#4a7c59" },
-    { id: "christianunions", name: "Christian Unions", subtitle: "Catholic Labor Current",
+      raw: Math.max(Q.dsbp_young_germans, 0), color: isDark ? "#c9a86a" : "#5c4a1e" },
+    { id: "christianunions", name: "Christian Unions", subtitle: "Christian Unions and Labor",
       raw: Math.max(Q.dsbp_christian_unions, 0), color: isDark ? "#ff9fdd" : "#FC7CD2" },
-    { id: "liberalclubs", name: "Liberal & Corporatist Clubs", subtitle: "Business & Professional Associations",
+    { id: "liberalclubs", name: "Liberal & Corporatist Clubs", subtitle: "Small clubs, like Front 1929 and February Club",
       raw: Math.max(Q.dsbp_liberal_clubs, 0), color: isDark ? "#DCCA4A" : "#8a7a1e" }
 ];
 
@@ -766,20 +772,22 @@ if (d3 && window) {
     if (screenWidth < width - 50) { width = screenWidth - 50; }
 
     var _dsbp_fields = [
-        'dsbp_left_democrats', 'dsbp_centrists', 'dsbp_nationalists',
+        'dsbp_left_democrats', 'dsbp_centre_left', 'dsbp_centre_right', 'dsbp_nationalists',
         'dsbp_young_germans', 'dsbp_christian_unions', 'dsbp_liberal_clubs'
     ];
     var _dsbp_colors = {
         dsbp_left_democrats: '#595BFF',
-        dsbp_centrists: '#5c4a1e',
+        dsbp_centre_left: '#4a7c59',
+        dsbp_centre_right: '#3f7bc1',
         dsbp_nationalists: '#8a3b12',
-        dsbp_young_germans: '#4a7c59',
+        dsbp_young_germans: '#5c4a1e',
         dsbp_christian_unions: '#FC7CD2',
         dsbp_liberal_clubs: '#8a7a1e'
     };
     var _dsbp_labels = {
         dsbp_left_democrats: 'Left Democrats',
-        dsbp_centrists: 'Centrists',
+        dsbp_centre_left: 'Centre Left',
+        dsbp_centre_right: 'Centre Right',
         dsbp_nationalists: 'Nationalists',
         dsbp_young_germans: 'Young Germans',
         dsbp_christian_unions: 'Christian Unions',
@@ -801,7 +809,9 @@ go-to: party_spy
 
 *Left Democrats: [+ dsbp_left_disp +] ([+ dsbp_left_pct +]%)*
 
-*Centrists: [+ dsbp_centrists_disp +] ([+ dsbp_centrists_pct +]%)*
+*Centre Left: [+ dsbp_centreleft_disp +] ([+ dsbp_centreleft_pct +]%)*
+
+*Centre Right: [+ dsbp_centreright_disp +] ([+ dsbp_centreright_pct +]%)*
 
 *Nationalists: [+ dsbp_nat_disp +] ([+ dsbp_nat_pct +]%)*
 
@@ -812,8 +822,6 @@ go-to: party_spy
 *Liberal & Corporatist Clubs: [+ dsbp_liberal_disp +] ([+ dsbp_liberal_pct +]%)*
 
 {!<svg id="dsbp_faction_history" style="width: 500px; height: 400px;"> </svg>!}
-
-
 
 
 
