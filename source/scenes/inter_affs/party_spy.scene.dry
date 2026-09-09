@@ -853,7 +853,7 @@ go-to: party_spy
 We can now spy on DNVP.
 
 @unlock_dvp
-view-if: dvp_unlocked_spy <= 0
+view-if: dvp_unlocked_spy <= 0 and (dsbp_factions < 1 or sandbox == 1)
 choose-if: resources >= 2
 subtitle: -2 resources
 unavailable-subtitle: Not enough resources.
@@ -873,7 +873,7 @@ go-to: party_spy
 We can now spy on Zentrum.
 
 @unlock_ddp
-view-if: ddp_unlocked_spy <= 0
+view-if: ddp_unlocked_spy <= 0 and (dsbp_factions < 1 or sandbox == 1)
 choose-if: resources >= 2
 subtitle: -2 resources
 unavailable-subtitle: Not enough resources.
