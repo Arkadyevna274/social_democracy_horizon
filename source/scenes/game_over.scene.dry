@@ -580,6 +580,15 @@ h1, h2, h3 { margin-bottom: 12px; margin-top: 20px; }
 {!<div class="ach ach-locked"><div class="ach-icon-box"><img class="ach-icon" src="img/achievements/national_rejuvenation.png"></div><div class="ach-body"><strong>Nationale Erneuerung</strong> - Three pillars, two faiths, one nation - elevated above all differences.</div></div>!}
 ?]
 
+= For future plans
+
+[? if achievement_morgengrauen :
+{!<div class="ach" style="background:rgba(45,12,18,0.5);"><div class="ach-icon-box" style="background:rgba(85,20,30,0.65);"><img class="ach-icon" src="img/achievements/francais.jpg"></div><div class="ach-body"><strong>Morgengrauen</strong> - Across the western horizon, a dark dawn looms...!}[? if game_achievement_morgengrauen : {!<span class="ach-new">Neu!</span>!}?]{!</div></div>!}
+?]
+[? if not achievement_morgengrauen :
+{!<div class="ach ach-locked" style="background:rgba(45,12,18,0.5);"><div class="ach-icon-box" style="background:rgba(85,20,30,0.65);"><img class="ach-icon" src="img/achievements/francais.jpg"></div><div class="ach-body"><strong>Morgengrauen</strong> - Across the western horizon, a dark dawn looms...</div></div>!}
+?]
+
 {!</div>!}
 
 {!<div class="ach-section">!}
