@@ -22,6 +22,35 @@ if (Q.jungdo_formed != 1) {
 
 Q.parties.push('dsbp');
 
+if (!Q.dsbp_seeded) {
+
+    // Left Democrats — social-republican DDP current
+    Q.dsbp_left_democrats = Q.social_republican_ddp;
+
+    // Centrists — business-wing DDP fused with DVP's left/national-liberal current
+    Q.dsbp_centrists = Q.business_wing_ddp + Q.dvp_left;
+
+    // Nationalists — DNVP Christian-Social wing + Young Conservatives + DVP right
+    Q.dsbp_nationalists = (Q.delegate_power_christsoc * 0.2)
+        + (Q.delegate_power_yocon * 0.1)
+        + (Q.dvp_right * 0.2);
+
+    // Young Germans — Jungdo bloc + working/unemployed youth across DVP & DDP
+    Q.dsbp_young_germans = (Q.jungdo_strength * 1.2)
+        + (Q.workers_youth_dvp * 3) + (Q.workers_youth_ddp * 3)
+        + (Q.unemployedc_youth_dvp * 3) + (Q.unemployedc_youth_ddp * 3);
+
+    // Christian Unions — Catholic-aligned workers/new-middle from DVP and DDP
+    Q.dsbp_christian_unions = Q.workers_catholics_dvp + Q.new_middle_catholics_dvp
+        + Q.workers_catholics_ddp + Q.new_middle_catholics_ddp;
+
+    // Liberal & Corporatist Clubs — new/old-middle youth across DVP and DDP
+    Q.dsbp_liberal_clubs = (Q.new_middle_youth_dvp * 3) + (Q.new_middle_youth_ddp * 4)
+        + (Q.old_middle_youth_dvp * 3) + (Q.old_middle_youth_ddp * 4);
+
+    Q.dsbp_seeded = 1;
+}
+
 // Transfer votes from DDp and DVP to DSBP
 Q.workers_dsbp     = (Q.workers_ddp     || 0) + (Q.workers_dvp     || 0);
 Q.new_middle_dsbp  = (Q.new_middle_ddp  || 0) + (Q.new_middle_dvp  || 0);
