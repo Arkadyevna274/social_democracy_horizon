@@ -20,3 +20,25 @@ The following candidates stand:
 • Baron Rochus von Rheinbaben, leader of the corporatist liberal Front 1929 and main organizer of this unification.
 
 • Friedrich Baltrusch and Georg Streiter, duumvirate representatives of Christian Union Trades within DVP.
+
+- @result:
+
+@result
+
+@mahraun
+on-arrival: dsbp_party_leader = "Mahraun"
+
+@weser
+on-arrival: dsbp_party_leader = "Weser"
+
+@thiel
+on-arrival: dsbp_party_leader = "Thiel"
+
+@curtius
+on-arrival: dsbp_party_leader = "Curtius"
+
+@rheinbaben
+on-arrival: dsbp_party_leader = "Rheinbaben"
+
+@baltrusch
+on-arrival: dsbp_party_leader = "Baltrusch"
