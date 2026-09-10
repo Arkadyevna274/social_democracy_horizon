@@ -6297,6 +6297,12 @@ if (Q.secularized == 1) {
     Q.dvp_left += 2.5;
 }
 
+if (Q.cv_salaries > 0) {
+    Q.dvp_left += Q.cv_salaries * 0.50;
+} else if (Q.cv_salaries < 0) {
+    Q.dvp_right += Math.abs(Q.cv_salaries || 0) * 0.90;
+}
+
 Q.dvp_right += (Q.capital_strike_progress || 0) * 0.35;
 Q.dvp_right += (Q.workers_safety || 0) * 0.35;
 Q.dvp_left += (Q.judicial_reform || 0) * 1.28;
@@ -6386,7 +6392,7 @@ if (Q.congress_path == "young_conservative") {
 
 if (Q.ddp_in_government) {
     if (Q.spd_in_government) {
-        Q.social_republican_ddp += 1.5;
+        Q.social_republican_ddp += 2.5;
         Q.business_wing_ddp -= 0.5;
     } else {
         Q.business_wing_ddp += 1.2;
@@ -6397,18 +6403,24 @@ if (Q.ddp_in_government) {
     Q.social_republican_ddp -= 1.2;
 }
 
-Q.social_republican_ddp += ((Q.ddp_relation || 0) / 8) * 0.35;
+Q.social_republican_ddp += ((Q.ddp_relation || 0) / 8) * 0.75;
 Q.business_wing_ddp += ((100 - (Q.ddp_relation || 0)) * 0.5) * 0.35;
 
 if (Q.welfare <= 0) {
     Q.social_republican_ddp += Math.abs(Q.welfare || 0) * 0.85;
 }
 
+if (Q.cv_salaries > 0) {
+    Q.social_republican_ddp += Q.cv_salaries * 1.25
+} else if (Q.cv_salaries < 0) {
+    Q.business_wing_ddp += Math.abs(Q.cv_salaries || 0) * 0.85;
+}
+
 if (Q.workers_aid <= 0) {
     Q.social_republican_ddp += Math.abs(Q.workers_aid || 0) * 0.50;
 }
 
-if (Q.ideology == "reformist") Q.social_republican_ddp += 1.8;
+if (Q.ideology == "reformist") Q.social_republican_ddp += 2.8;
 if (Q.ideology == "labor") {
     Q.social_republican_ddp -= 1.28;
     Q.business_wing_ddp += 1.28;
@@ -6418,7 +6430,7 @@ if (Q.ideology == "left") {
     Q.social_republican_ddp -= 1.8;
 }
 
-if (Q.womens_rights > 0) Q.social_republican_ddp += 0.11 + Q.womens_rights;
+if (Q.womens_rights > 0) Q.social_republican_ddp += 0.22 + Q.womens_rights;
 if (Q.kwg_research > 0) Q.social_republican_ddp += 0.51 + Q.kwg_research;
 if (Q.family_law > 0) Q.social_republican_ddp += 0.15 + Q.family_law;
 if (Q.womens_work > 0) Q.social_republican_ddp += 0.10 + Q.womens_work;
@@ -6691,11 +6703,130 @@ if (Q.z_party_leader == "Joseph Joos") {
 
 
 // DSBP
-// For information: we have left democrats (ddp), centrists (center + right ddp + left dvp), nationalists (center left dvp), young germans (Jungdo), christian unions (catholics), liberal + corporatist clubs.
-// ==========================================
-// DSBP FORMATION — INITIAL FACTION SEEDING
-// ==========================================
+// For information: we have left democrats (ddp), center left of right ddp, center of dvp stresemannites, nationalists (center right dvp, some dnvp members), young germans (Jungdo), christian unions (catholics), liberal + corporatist clubs.
+//
 
+if (Q.dsbp_factions >= 1) {
+  Q.dsbp_left_democrats += (Q.dsbp_relation - 50) * 0.02;
+  Q.dsbp_centre_left += (Q.dsbp_relation - 50) * 0.05; // 0 at 50, 2.5 at 100
+  Q.dsbp_centre_right += (50 - Q.dsbp_relation) * 0.02;
+  Q.dsbp_young_germans += (50 - Q.dsbp_relation) * 0.07;
+  Q.dsbp_nationalists += (50 - Q.dsbp_relation) * 0.15;
+
+  Q.dsbp_left_democrats += (Q.workers_youth_dsbp * 0.2) + (Q.new_middle_youth_dsbp * 0.5) + Q.new_middle_seculars_dsbp + Q.old_middle_seculars_dsbp;
+  Q.dsbp_centre_left += (Q.new_middle_protestants_dsbp * 0.5) + (Q.new_middle_catholics_dsbp * 0.2) + (Q.old_middle_protestants_dsbp * 0.2) +  (Q.old_middle_catholics_dsbp * 0.1);
+  Q.dsbp_centre_right += Q.old_middle_dsbp * 0.7 + Q.rural_dsbp * 0.7;
+  Q.dsbp_young_germans += (Q.workers_youth_dsbp * 0.8) + (Q.workers_dsbp * 0.2) + (Q.new_middle_youth_dsbp * 0.2) + (Q.old_middle_youth_dsbp * 0.2) + (Q.rural_youth_dsbp * 0.2) + Q.unemployedc_dsbp;
+  Q.dsbp_nationalists += Q.old_middle_dsbp * 0.3 + Q.rural_dsbp * 0.3 + Q.old_middle_protestants_dsbp * 0.3 + Q.old_middle_catholics_dsbp * 0.3;
+  Q.dsbp_christian_unions += (Q.workers_catholics_dsbp * 0.3) + (Q.new_middle_catholics_dsbp * 0.4) + (Q.old_middle_catholics_dsbp * 0.2);
+  Q.dsbp_liberal_clubs += (Q.new_middle_youth_dsbp * 0.3) + (Q.new_middle_dsbp * 0.2) + (Q.old_middle_youth_dsbp * 0.2) + (Q.old_middle_dsbp * 0.1);
+
+// Ideology Adjustments — mirrors DVP/DDP/DNVP conventions
+if (Q.ideology == "reformist") {
+    Q.dsbp_left_democrats += 1.2;
+    Q.dsbp_centre_left += 0.8;
+    Q.dsbp_christian_unions += 0.5;
+    Q.dsbp_nationalists -= 0.5;
+}
+if (Q.ideology == "labor") {
+    Q.dsbp_left_democrats -= 0.8;
+    Q.dsbp_centre_right += 0.5;
+    Q.dsbp_young_germans += 0.5;
+    Q.dsbp_christian_unions += 0.3;
+}
+if (Q.ideology == "left") {
+    Q.dsbp_left_democrats -= 1.8;
+    Q.dsbp_centre_left -= 0.8;
+    Q.dsbp_centre_right += 1.2;
+    Q.dsbp_nationalists += 1.5;
+    Q.dsbp_young_germans += 0.8;
+}
+
+if (Q.upper_tax_rates > 0) {
+    Q.dsbp_centre_right += 0.6 * Q.upper_tax_rates;
+    Q.dsbp_nationalists += 0.4 * Q.upper_tax_rates;
+    Q.dsbp_liberal_clubs += 0.5 * Q.upper_tax_rates;
+    Q.dsbp_left_democrats -= 0.3 * Q.upper_tax_rates;
+}
+if (Q.welfare > 1) {
+    Q.dsbp_centre_right += 0.5 * Q.welfare;
+    Q.dsbp_left_democrats -= 0.4 * Q.welfare;
+} else if (Q.welfare < 0) {
+    Q.dsbp_left_democrats += Math.abs(Q.welfare) * 0.7;
+    Q.dsbp_centre_left += Math.abs(Q.welfare) * 0.4;
+    Q.dsbp_young_germans += Math.abs(Q.welfare) * 0.3; // austerity radicalizes youth too
+}
+if (Q.works_councils > 0) {
+    Q.dsbp_centre_right += 0.9 * Q.works_councils;
+    Q.dsbp_liberal_clubs += 0.6 * Q.works_councils;
+}
+if (Q.socialization > 0) {
+    Q.dsbp_centre_right += 1.8 * Q.socialization; // DVP's strongest anti-reaction, scaled down for DSBP
+    Q.dsbp_nationalists += 1.2 * Q.socialization;
+    Q.dsbp_liberal_clubs += 1.0 * Q.socialization;
+}
+if (Q.cooperatives > 0) {
+    Q.dsbp_centre_right += 0.9 * Q.cooperatives;
+    Q.dsbp_christian_unions += 0.4 * Q.cooperatives; // corporatist sympathy
+}
+if (Q.unions_independent) {
+    Q.dsbp_left_democrats += 2.5; 
+    Q.dsbp_christian_unions += 2;
+}
+
+if (Q.cv_salaries > 0) {
+    Q.dsbp_left_democrats += Q.cv_salaries * 0.25;
+    Q.dsbp_centre_left += Q.cv_salaries * 0.20;
+    Q.dsbp_christian_unions += Q.cv_salaries * 0.15;
+} else if (Q.cv_salaries < 0) {
+    Q.dsbp_centre_right += Math.abs(Q.cv_salaries) * 0.45;
+    Q.dsbp_nationalists += Math.abs(Q.cv_salaries) * 0.35;
+    Q.dsbp_young_germans += Math.abs(Q.cv_salaries) * 0.20;
+}
+
+if (Q.dsbp_in_government) {
+    if (Q.spd_in_government) {
+        Q.dsbp_left_democrats += 1.5;
+        Q.dsbp_centre_left += 1.0;
+        Q.dsbp_nationalists -= 1.2;
+        Q.dsbp_young_germans -= 0.6;
+    } else {
+        Q.dsbp_centre_right += 1.5;
+        Q.dsbp_nationalists += 1.0;
+        Q.dsbp_liberal_clubs += 0.8;
+    }
+  } else {
+    Q.dsbp_young_germans += 1.0;
+    Q.dsbp_nationalists += 0.8;
+  }
+
+
+
+
+// Global regulation: cap combined total of all tracked DSBP factions
+{
+    const _dsbp_total_cap = 1000;
+    const _dsbp_tracked = [
+        'dsbp_left_democrats',
+        'dsbp_centre_left',
+        'dsbp_centre_right',
+        'dsbp_young_germans',
+        'dsbp_nationalists',
+        'dsbp_christian_unions',
+        'dsbp_liberal_clubs'
+    ];
+
+    const _dsbp_sum = _dsbp_tracked.reduce((sum, key) => sum + (Q[key] || 0), 0);
+
+    if (_dsbp_sum > _dsbp_total_cap) {
+        const _dsbp_scale = _dsbp_total_cap / _dsbp_sum;
+        _dsbp_tracked.forEach(key => {
+            Q[key] *= _dsbp_scale;
+        });
+    }
+  }
+
+}
 
 
 
