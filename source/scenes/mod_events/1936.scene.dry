@@ -13,7 +13,7 @@ After the disastrous Great Depression of 1929, it seemed like Germany was destin
 Regardless, future is ahead of Germany.
 
 - @forward: Forward!
-- @remain: Maybe I would remain like to remain in the past.
+- @root: Maybe I would remain like to remain in the past.
 
 @forward
 on-arrival: new_germany = 1; nsdap_banned = 1 if nsdap_pct < 3
