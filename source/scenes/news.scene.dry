@@ -91,6 +91,8 @@ for (const party of Q.parties) {
     }
 }
 
+Q.daily_event_display_text = Q.daily_event_description || '';
+
 !}
 
 = Party Actions
@@ -102,3 +104,5 @@ for (const party of Q.parties) {
 [? if government_flavor_display_text != 0: [+ government_flavor_display_text +] ?]
 
 = Daily events
+
+[? if daily_event_display_text != 0: [+ daily_event_display_text +] ?]
