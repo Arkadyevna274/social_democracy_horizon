@@ -7025,9 +7025,11 @@ function PickHighest(list, prop) {
     var bestKey = null;
     var bestVal = -Infinity;
     for (var key in list) {
-        if (list[key].ignore) continue;
-        if (list[key][prop] > bestVal) {
-            bestVal = list[key][prop];
+        if (!list[key].eligible) continue;
+        var val = list[key][prop];
+        if (typeof val !== 'number' || Number.isNaN(val)) continue; // guard against undefined/NaN weights so a broken Q value can never win or lock up the comparison
+        if (val > bestVal) {
+            bestVal = val;
             bestKey = key;
         }
     }
@@ -7094,11 +7096,6 @@ function partyLabel(party) {
     return Q.PARTY_DISPLAY_NAMES[party] || party.toUpperCase();
 }
 
-// Map internal class keys (as used in Q.classes / computeTarget's `c`
-// argument) to the campaign_focus_<party> string vocabulary used by
-// _campaignMult / _campaignSpeedBonus in the QOL/drift system
-// (_CAMPAIGN_FOCUS_CLASS_MAP there maps the other direction). Only
-// 'unemployedc' differs from its own class key ('unemployed' focus).
 Q.CLASS_TO_CAMPAIGN_FOCUS = {
     workers:     'workers',
     unemployedc: 'unemployed',
@@ -7114,11 +7111,11 @@ Q.GLOBAL_PARTY_ACTIONS = {
         ideoMin: 17, ideoMax: 20,
         weight: () => scaledWeight(1.30, Q.stahlhelm_strength, 1300),
         description: (party) => partyLabel(party) + ' has overseen Der Stahlhelm recruiting some of the disgruntled mittelstand and outclasses into their paramilitary, receiving some anonymous fundings alongside.',
-        ignore: (party) => Q.sh_banned >= 1 || !isParty(party, 'dnvp'),
+        eligible: (party) => Q.sh_banned < 1 && isParty(party, 'dnvp'),
         timer: 10,
         apply: () => {
-            Q.stahlhelm_strength += 50;
-            Q.stahlhelm_militancy += 0.01;
+            Q.sh_strength += 50;
+            Q.sh_militancy += 0.01;
         }
     },
 
@@ -7126,7 +7123,7 @@ Q.GLOBAL_PARTY_ACTIONS = {
         ideoMin: 1, ideoMax: 4,
         weight: () => scaledWeight(1.30, Q.rfb_strength, 1000),
         description: (party) => partyLabel(party) + ' has overseen the Roter Frontkämpferbund recruiting some of the disgruntled workers and unemployed into their paramilitary, receiving some anonymous fundings alongside.',
-        ignore: (party) => Q.rfb_banned >= 1 || !isParty(party, 'kpd'),
+        eligible: (party) => Q.rfb_banned < 1 && isParty(party, 'kpd'),
         timer: 10,
         apply: () => {
             Q.rfb_strength += 50;
@@ -7138,7 +7135,7 @@ Q.GLOBAL_PARTY_ACTIONS = {
         ideoMin: 14, ideoMax: 20,
         weight: () => scaledWeight(0.75, Q.nationalism, 5),
         description: (party) => partyLabel(party) + ' has initiated a rally for nationalism and opposition against the republican order.',
-        ignore: () => false,
+        eligible: () => true,
         timer: 8,
         apply: () => {
             Q.nationalism += 2;
@@ -7149,7 +7146,7 @@ Q.GLOBAL_PARTY_ACTIONS = {
         ideoMin: 16, ideoMax: 20,
         weight: () => linearWeight(4.00, Q.prussian_republicanization, 30),
         description: (party) => partyLabel(party) + ' has replaced republican and socialist officials in Prussia with nationalist judges and civil servants, steering the state police away from democratic values.',
-        ignore: (party) => Q[party + '_in_government_prussia'] <= 0,
+        eligible: (party) => Q[party + '_in_government_prussia'] > 0,
         timer: 10,
         apply: () => {
             Q.prussian_republicanization -= 5;
@@ -7163,7 +7160,7 @@ Q.GLOBAL_PARTY_ACTIONS = {
         ideoMin: 14, ideoMax: 20,
         weight: () => scaledWeight(4.00, Q.rfb_strength * Q.rfb_militancy, 500),
         description: (party) => partyLabel(party) + ' has prohibited the communist RFB paramilitary across Prussia, dealing a severe blow to left-wing militant organization in the state.',
-        ignore: (party) => Q[party + '_in_government_prussia'] <= 0 || Q.rfb_banned >= 1,
+        eligible: (party) => Q[party + '_in_government_prussia'] > 0 && Q.rfb_banned < 1,
         timer: 12,
         apply: () => {
             Q.rfb_banned = 1;
@@ -7176,7 +7173,7 @@ Q.GLOBAL_PARTY_ACTIONS = {
         ideoMin: 17, ideoMax: 20,
         weight: () => scaledWeight(4.00, Q.rb_strength * Q.rb_militancy, 500),
         description: (party) => partyLabel(party) + ' has issued a total ban on the Reichsbanner, citing the pro-republican paramilitary as too dangerous to permit its public activities.',
-        ignore: (party) => Q[party + '_in_government_prussia'] <= 0 || Q.rb_banned >= 1,
+        eligible: (party) => Q[party + '_in_government_prussia'] > 0 && Q.rb_banned < 1,
         timer: 12,
         apply: () => {
             Q.rb_banned = 1;
@@ -7189,7 +7186,7 @@ Q.GLOBAL_PARTY_ACTIONS = {
         ideoMin: 1, ideoMax: 5,
         weight: () => scaledWeight(4.00, Q.stahlhelm_strength * Q.stahlhelm_militancy, 500),
         description: (party) => partyLabel(party) + ' has banned Der Stahlhelm across Prussia, moving to suppress the nationalist paramilitary\'s activities in the state.',
-        ignore: (party) => Q[party + '_in_government_prussia'] <= 0 || Q.sh_banned >= 1,
+        eligible: (party) => Q[party + '_in_government_prussia'] > 0 && Q.sh_banned < 1,
         timer: 12,
         apply: () => {
             Q.sh_banned = 1;
@@ -7202,7 +7199,7 @@ Q.GLOBAL_PARTY_ACTIONS = {
         ideoMin: 1, ideoMax: 11,
         weight: () => scaledWeight(4.00, Q.sa_strength * Q.sa_militancy, 500),
         description: (party) => partyLabel(party) + ' has banned the SA across Prussia, striking at the Nazi paramilitary\'s ability to organize in the state.',
-        ignore: (party) => Q[party + '_in_government_prussia'] <= 0 || Q.sa_banned >= 1,
+        eligible: (party) => Q[party + '_in_government_prussia'] > 0 && Q.sa_banned < 1,
         timer: 12,
         apply: () => {
             Q.sa_banned = 1;
@@ -7215,7 +7212,7 @@ Q.GLOBAL_PARTY_ACTIONS = {
         ideoMin: 1, ideoMax: 6,
         weight: () => scaledWeight(0.75, Q.socialism, 5),
         description: (party) => partyLabel(party) + ' has initiated a rally for socialism and opposition against the republican order.',
-        ignore: () => false,
+        eligible: () => true,
         timer: 8,
         apply: () => {
             Q.socialism += 3;
@@ -7226,7 +7223,7 @@ Q.GLOBAL_PARTY_ACTIONS = {
         ideoMin: 7, ideoMax: 14,
         weight: () => scaledWeight(0.75, Q.pro_republic, 5),
         description: (party) => partyLabel(party) + ' has initiated a rally for republic and opposition against the extremist forces.',
-        ignore: () => false,
+        eligible: () => true,
         timer: 8,
         apply: () => {
             Q.pro_republic += 2;
@@ -7239,7 +7236,7 @@ Q.GLOBAL_PARTY_ACTIONS = {
             var oldR = Q['old_' + party + '_r'];
             var pct  = Q[party + '_pct'];
             if (!oldR || oldR <= 0) return 0;
-            var shortfall = Math.max(0, oldR - pct); // 0 if not underperforming
+            var shortfall = Math.max(0, oldR - pct);
             return linearWeight(5.00, shortfall, oldR, 4);
         },
         description: (party) => {
@@ -7253,20 +7250,19 @@ Q.GLOBAL_PARTY_ACTIONS = {
             }[focusClass] || 'the electorate';
             return partyLabel(party) + ' has launched a campaign push targeting ' + focusLabel + ', trailing its last Reichstag result.';
         },
-        ignore: (party) => {
+        eligible: (party) => {
             var oldR = Q['old_' + party + '_r'];
             var pct  = Q[party + '_pct'];
-            return !oldR || oldR <= 0 || pct >= oldR;
+            return !!oldR && oldR > 0 && pct < oldR;
         },
         timer: 8,
         apply: (party) => {
-            // --- Pick focus class: biggest shortfall vs computeTarget ---
             var bestClass = null;
             var bestGap   = -Infinity;
             for (const c of Q.classes) {
                 var current = Q[c + '_' + party] || 0;
                 var target  = computeTarget(party, c);
-                var gap     = target - current; // positive = underperforming potential here
+                var gap     = target - current;
                 if (gap > bestGap) {
                     bestGap   = gap;
                     bestClass = c;
@@ -7274,15 +7270,12 @@ Q.GLOBAL_PARTY_ACTIONS = {
             }
             if (!bestClass) return;
 
-            Q[party + '_campaign_target_class'] = bestClass; // for description/display
+            Q[party + '_campaign_target_class'] = bestClass;
             Q['campaign_focus_' + party] = Q.CLASS_TO_CAMPAIGN_FOCUS[bestClass] || bestClass;
 
-            // --- Intensity scaled by how far below old_r they are ---
             var oldR = Q['old_' + party + '_r'];
             var pct  = Q[party + '_pct'];
-            var shortfallRatio = Math.min(1.0, Math.max(0, oldR - pct) / oldR); // 0..1
-            // Floor of 0.4 so even a marginal shortfall still mounts a
-            // meaningful campaign; scales up to 1.0 at total collapse.
+            var shortfallRatio = Math.min(1.0, Math.max(0, oldR - pct) / oldR);
             var newIntensity = 0.4 + shortfallRatio * 0.6;
 
             Q['campaign_intensity_' + party] = Math.max(
@@ -7298,7 +7291,7 @@ function runPartyActions(party) {
     var timerKey = party + '_action_timer';
     var bannedKey = party + '_banned';
     var descKey = party + '_action_description';
-    var flavorTimerKey = party + '_flavor_action_timer'; // per-party now
+    var flavorTimerKey = party + '_flavor_action_timer';
 
     if (Q[timerKey] > 0 || Q[bannedKey]) return;
 
@@ -7309,7 +7302,7 @@ function runPartyActions(party) {
 
         pool[key] = {
             weight: action.weight(party),
-            ignore: action.ignore ? action.ignore(party) : false,
+            eligible: action.eligible ? action.eligible(party) : true,
             timer: action.timer,
             description: action.description(party)
         };
@@ -7327,7 +7320,6 @@ function runPartyActions(party) {
     Q[descKey] = pool[chosen].description;
     Q.GLOBAL_PARTY_ACTIONS[chosen].apply(party);
 
-    // Queue this party's OWN flavor timer, keyed to it specifically
     var flavorTimerName = party + '_flavor_action';
     if (!Q.timers.includes(flavorTimerName)) {
         Q.timers.push(flavorTimerName);
@@ -7341,19 +7333,8 @@ for (const party of Q.parties) {
 }
 
 
-
-
-
-
-
-
-
-
 // PARTY GOVERNMENT ACTIONS
 
-// --- Ministry registry ---
-// Each ministry maps to a Q key of the form "<ministry>_party", e.g.
-// Q.finance_minister_party === 'dnvp' means the DNVP holds Finance.
 Q.MINISTRIES = [
     'transport_minister',
     'agriculture_minister',
@@ -7364,12 +7345,10 @@ Q.MINISTRIES = [
     'foreign_minister'
 ];
 
-// Returns true if `party` currently holds `ministry` (e.g. 'finance_minister').
 function holdsMinistry(party, ministry) {
     return Q[ministry + '_party'] && Q[ministry + '_party'].toLowerCase() === party.toLowerCase();
 }
 
-// Returns true if `party` holds ANY cabinet ministry.
 function holdsAnyMinistry(party) {
     for (var i = 0; i < Q.MINISTRIES.length; i++) {
         if (holdsMinistry(party, Q.MINISTRIES[i])) return true;
@@ -7377,14 +7356,10 @@ function holdsAnyMinistry(party) {
     return false;
 }
 
-// Returns true if `party` is the chancellor's party.
 function isChancellorParty(party) {
     return Q.chancellor_party && Q.chancellor_party.toLowerCase() === party.toLowerCase();
 }
 
-// Convenience: is this party "in government" at the Reich level at all
-// (chancellorship OR any ministry)? Mirrors the xparty_in_government_prussia
-// pattern used for the Prussian actions.
 function inReichGovernment(party) {
     return Q[party + '_in_government'] >= 1 || isChancellorParty(party) || holdsAnyMinistry(party);
 }
@@ -7397,7 +7372,7 @@ Q.GLOBAL_PARTY_GOVERNMENT_ACTIONS = {
         ideoMin: 1, ideoMax: 20,
         weight: () => 3.00,
         description: (party) => partyLabel(party) + ', holding the Chancellery, has pushed its legislative agenda through the cabinet.',
-        ignore: (party) => !isChancellorParty(party),
+        eligible: (party) => isChancellorParty(party),
         timer: 8,
         apply: () => {
             Q.government_stability += 1;
@@ -7408,7 +7383,7 @@ Q.GLOBAL_PARTY_GOVERNMENT_ACTIONS = {
         ideoMin: 1, ideoMax: 20,
         weight: () => 2.50,
         description: (party) => partyLabel(party) + ', controlling the Finance Ministry, has maneuvered the budget to favor its base.',
-        ignore: (party) => !holdsMinistry(party, 'finance_minister'),
+        eligible: (party) => holdsMinistry(party, 'finance_minister'),
         timer: 8,
         apply: () => {
             Q.government_stability += 0.5;
@@ -7419,7 +7394,7 @@ Q.GLOBAL_PARTY_GOVERNMENT_ACTIONS = {
         ideoMin: 1, ideoMax: 20,
         weight: () => 2.50,
         description: (party) => partyLabel(party) + ', at the head of the Economics Ministry, has shifted regulatory policy in its favored direction.',
-        ignore: (party) => !holdsMinistry(party, 'economic_minister'),
+        eligible: (party) => holdsMinistry(party, 'economic_minister'),
         timer: 8,
         apply: () => {
             Q.government_stability += 0.5;
@@ -7430,7 +7405,7 @@ Q.GLOBAL_PARTY_GOVERNMENT_ACTIONS = {
         ideoMin: 1, ideoMax: 20,
         weight: () => 2.00,
         description: (party) => partyLabel(party) + ', running the Labor Ministry, has intervened in ongoing industrial disputes.',
-        ignore: (party) => !holdsMinistry(party, 'labor_minister'),
+        eligible: (party) => holdsMinistry(party, 'labor_minister'),
         timer: 8,
         apply: () => {
             Q.government_stability += 0.5;
@@ -7441,7 +7416,7 @@ Q.GLOBAL_PARTY_GOVERNMENT_ACTIONS = {
         ideoMin: 1, ideoMax: 20,
         weight: () => 2.00,
         description: (party) => partyLabel(party) + ', in charge of the Justice Ministry, has steered key judicial appointments.',
-        ignore: (party) => !holdsMinistry(party, 'justice_minister'),
+        eligible: (party) => holdsMinistry(party, 'justice_minister'),
         timer: 10,
         apply: () => {
             Q.government_stability += 0.5;
@@ -7452,7 +7427,7 @@ Q.GLOBAL_PARTY_GOVERNMENT_ACTIONS = {
         ideoMin: 1, ideoMax: 20,
         weight: () => 2.00,
         description: (party) => partyLabel(party) + ', holding the Foreign Ministry, has advanced a diplomatic initiative abroad.',
-        ignore: (party) => !holdsMinistry(party, 'foreign_minister'),
+        eligible: (party) => holdsMinistry(party, 'foreign_minister'),
         timer: 10,
         apply: () => {
             Q.government_stability += 0.5;
@@ -7463,7 +7438,7 @@ Q.GLOBAL_PARTY_GOVERNMENT_ACTIONS = {
         ideoMin: 1, ideoMax: 20,
         weight: () => 1.75,
         description: (party) => partyLabel(party) + ', controlling the Agriculture Ministry, has enacted relief measures for farmers.',
-        ignore: (party) => !holdsMinistry(party, 'agriculture_minister'),
+        eligible: (party) => holdsMinistry(party, 'agriculture_minister'),
         timer: 8,
         apply: () => {
             Q.government_stability += 0.5;
@@ -7474,7 +7449,7 @@ Q.GLOBAL_PARTY_GOVERNMENT_ACTIONS = {
         ideoMin: 1, ideoMax: 20,
         weight: () => 1.75,
         description: (party) => partyLabel(party) + ', overseeing the Transport Ministry, has brokered an infrastructure deal.',
-        ignore: (party) => !holdsMinistry(party, 'transport_minister'),
+        eligible: (party) => holdsMinistry(party, 'transport_minister'),
         timer: 8,
         apply: () => {
             Q.government_stability += 0.5;
@@ -7485,7 +7460,7 @@ Q.GLOBAL_PARTY_GOVERNMENT_ACTIONS = {
         ideoMin: 1, ideoMax: 20,
         weight: () => scaledWeight(1.00, Q.government_stability, 10),
         description: (party) => partyLabel(party) + ' has worked behind the scenes to keep the coalition cabinet aligned.',
-        ignore: (party) => !inReichGovernment(party),
+        eligible: (party) => inReichGovernment(party),
         timer: 6,
         apply: () => {
             Q.government_stability += 0.25;
@@ -7501,7 +7476,6 @@ function runPartyGovernmentActions(party) {
 
     if (Q[timerKey] > 0 || Q[bannedKey]) return;
 
-    // Main gate: party must actually be in government to act here at all.
     if (!inReichGovernment(party)) return;
 
     var pool = {};
@@ -7511,7 +7485,7 @@ function runPartyGovernmentActions(party) {
 
         pool[key] = {
             weight: action.weight(party),
-            ignore: action.ignore ? action.ignore(party) : false,
+            eligible: action.eligible ? action.eligible(party) : true,
             timer: action.timer,
             description: action.description(party)
         };
@@ -7540,6 +7514,60 @@ for (const party of Q.parties) {
     if (party === 'spd') continue;
     runPartyGovernmentActions(party);
 }
+
+
+
+
+// DAILY EVENTS
+
+// --- Global event registry ---
+Q.GLOBAL_DAILY_EVENTS = {
+
+    generic_daily_event: {
+        weight: () => scaledWeight(1.00, Q.nationalism, 10),
+        description: () => 'A generic development has occurred, reflecting shifting conditions across the Reich.',
+        eligible: () => true,
+        timer: 6,
+        apply: () => {
+            Q.nationalism += 0;
+        }
+    },
+
+};
+
+// --- Run the daily event roll ---
+function runDailyEvents() {
+    var timerKey = 'daily_event_timer';
+    var descKey = 'daily_event_description';
+
+    if (Q[timerKey] > 0) return;
+
+    var pool = {};
+    for (var key in Q.GLOBAL_DAILY_EVENTS) {
+        var event = Q.GLOBAL_DAILY_EVENTS[key];
+
+        pool[key] = {
+            weight: event.weight(),
+            eligible: event.eligible ? event.eligible() : true,
+            timer: event.timer,
+            description: event.description()
+        };
+    }
+
+    var chosen = PickHighest(pool, 'weight');
+
+    if (chosen === null) {
+        Q[timerKey] = 6;
+        Q[descKey] = 'No notable developments occur today.';
+        return;
+    }
+
+    Q[timerKey] = pool[chosen].timer;
+    Q[descKey] = pool[chosen].description;
+    Q.GLOBAL_DAILY_EVENTS[chosen].apply();
+}
+
+runDailyEvents();
 
 
 
