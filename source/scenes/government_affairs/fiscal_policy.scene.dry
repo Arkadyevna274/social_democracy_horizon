@@ -194,6 +194,7 @@ Current civil servant salaries: [+ cv_salaries: taxation +]
 - @raise_salaries: Raise the salaries of civil servants.
 - @slash_salaries: Slash the salaries of civil servants.
 - @fiscal_menu: Change domestic taxes instead.
+- @tariffs: Change tariffs instead
 - @root: Do not change anything.
 - @easy_discard
 
@@ -227,6 +228,7 @@ Current tariff level: [+ tariffs : taxation +]
 - @raise_tariffs
 - @lower_tariffs
 - @fiscal_menu: Change domestic taxes instead of tariffs.
+- @miscellanious: Miscellanious
 - @root: Do not change tariffs or taxes.
 - @easy_discard
 
