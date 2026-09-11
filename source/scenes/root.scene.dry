@@ -53,6 +53,7 @@ Q.dnvp_name = "DNVP";
 Q.country_name = "Weimar Republic";
 Q.prussian_republicanization = 50;
 Q.dnvp_referendum = 0;
+Q.stahlhelm_status = 0;
 
 Q.business_wing_ddp = 370;
 Q.social_republican_ddp = 130;
