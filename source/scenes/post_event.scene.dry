@@ -5610,40 +5610,45 @@ if (Q.year == 1928 && Q.month >= 2 && Q.strelitz_flavor_1 != 1) {
         Q[seatKey] += 1;
     }
 
-    // --- build table string instead of flat var list ---
-    var col1 = "Party", col2 = "%", col3 = "Seats";
+    // --- build HTML table ---
     var rows = [];
     for (var i = 0; i < strelitzKeys.length; i++) {
         var key = strelitzKeys[i];
         var seatKey = key.replace("strelitz_", "strelitz_party_r_");
-        rows.push([strelitzLabels[key], Q[key + "_pct"].toFixed(2) + "%", String(Q[seatKey])]);
+        rows.push({
+            label: strelitzLabels[key],
+            pct: Q[key + "_pct"].toFixed(2) + "%",
+            seats: Q[seatKey]
+        });
     }
-
-    var w1 = col1.length, w2 = col2.length, w3 = col3.length;
-    for (var i = 0; i < rows.length; i++) {
-        if (rows[i][0].length > w1) w1 = rows[i][0].length;
-        if (rows[i][1].length > w2) w2 = rows[i][1].length;
-        if (rows[i][2].length > w3) w3 = rows[i][2].length;
-    }
-
-    function padRight(s, w) { while (s.length < w) s += " "; return s; }
-    function padLeft(s, w) { while (s.length < w) s = " " + s; return s; }
-
-    var sep = "+-" + "-".repeat(w1) + "-+-" + "-".repeat(w2) + "-+-" + "-".repeat(w3) + "-+";
-    var lines = [];
-    lines.push(sep);
-    lines.push("| " + padRight(col1, w1) + " | " + padLeft(col2, w2) + " | " + padLeft(col3, w3) + " |");
-    lines.push(sep);
-    for (var i = 0; i < rows.length; i++) {
-        lines.push("| " + padRight(rows[i][0], w1) + " | " + padLeft(rows[i][1], w2) + " | " + padLeft(rows[i][2], w3) + " |");
-    }
-    lines.push(sep);
 
     var totalSeatCheck = 0;
-    for (var i = 0; i < rows.length; i++) totalSeatCheck += parseInt(rows[i][2], 10);
-    lines.push("Total seats: " + totalSeatCheck + " / " + totalSeats);
+    for (var i = 0; i < rows.length; i++) totalSeatCheck += rows[i].seats;
 
-    Q.strelitz_var_string = "<pre>" + lines.join("\n") + "</pre>";
+    var html = [];
+    html.push('<table class="strelitz-table" style="border-collapse:collapse;width:100%;">');
+    html.push('<thead><tr>');
+    html.push('<th style="text-align:left;border-bottom:1px solid #888;padding:2px 8px;">Party</th>');
+    html.push('<th style="text-align:right;border-bottom:1px solid #888;padding:2px 8px;">%</th>');
+    html.push('<th style="text-align:right;border-bottom:1px solid #888;padding:2px 8px;">Seats</th>');
+    html.push('</tr></thead>');
+    html.push('<tbody>');
+    for (var i = 0; i < rows.length; i++) {
+        html.push('<tr>');
+        html.push('<td style="text-align:left;padding:2px 8px;">' + rows[i].label + '</td>');
+        html.push('<td style="text-align:right;padding:2px 8px;">' + rows[i].pct + '</td>');
+        html.push('<td style="text-align:right;padding:2px 8px;">' + rows[i].seats + '</td>');
+        html.push('</tr>');
+    }
+    html.push('</tbody>');
+    html.push('<tfoot><tr>');
+    html.push('<td colspan="3" style="padding:4px 8px;border-top:1px solid #888;font-style:italic;">');
+    html.push('Total seats: ' + totalSeatCheck + ' / ' + totalSeats);
+    html.push('</td>');
+    html.push('</tr></tfoot>');
+    html.push('</table>');
+
+    Q.strelitz_var_string = html.join("");
 
     if (Q.strelitz_party_r_spd >= 18 && Q.achievement_strelitz != 1) {
         this.achieve('strelitz')
@@ -5790,8 +5795,10 @@ if (Q.year == 1928 && Q.month == 9 && Q.stahlhelm_furstenwalde != 1) {
         total_left >= 40) {
         
         Q.furstenwalde_message = 1;
+        Q.stahlhelm_status = 0;
     } else {
         Q.furstenwalde_message = 2;
+        Q.stahlhelm_status = 1;
         this.achieve('annahmeerklarung');
     } 
 }
@@ -7276,7 +7283,7 @@ Q.GLOBAL_PARTY_ACTIONS = {
             var oldR = Q['old_' + party + '_r'];
             var pct  = Q[party + '_pct'];
             var shortfallRatio = Math.min(1.0, Math.max(0, oldR - pct) / oldR);
-            var newIntensity = 0.4 + shortfallRatio * 0.6;
+            var newIntensity = 0.5 + shortfallRatio * 0.6;
 
             Q['campaign_intensity_' + party] = Math.max(
                 Q['campaign_intensity_' + party] || 0,
