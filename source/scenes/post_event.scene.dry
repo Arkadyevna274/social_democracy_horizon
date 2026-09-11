@@ -3980,7 +3980,7 @@ function computeTarget(party, c) {
             let cath_bonus  = Q.catholics / 8;
             let leader_mod  = Q.z_party_leader === 'Kaas' ? 0.94 : Q.z_party_leader === 'Joos' ? 1.06 : 1.0;
             let gov_mod     = Q.z_in_government ? 1.12 : 0.93;
-            base = (rep * 4 + cath_bonus * 3.4) * leader_mod * gov_mod * im.z * (eim.z || 1.0);
+            base = (rep * 2 + cath_bonus * 3.4) * leader_mod * gov_mod * im.z * (eim.z || 1.0);
 
             let floor = cath_bonus * 1.5 * gov_mod;
             base = Math.max(base, floor);
@@ -4014,28 +4014,28 @@ function computeTarget(party, c) {
                 : {};
 
             const class_mods = {
-                workers:     0.35 * (Q.z_party_leader == 'Adam Stegerwald' ? 1.08 : 1) * (Q.peoples_party === 1 ? 1.09 : 1) * (ccClassMult.workers || 1),
+                workers:     0.30 * (Q.z_party_leader == 'Adam Stegerwald' ? 1.08 : 1) * (Q.peoples_party === 1 ? 1.09 : 1) * (ccClassMult.workers || 1),
                 old_middle:  1.10 * (Q.peoples_party === 1 ? 0.91 : 1) * (ccClassMult.old_middle || 1),
                 new_middle:  0.90 * (Q.peoples_party === 1 ? 0.87 : 1) * (ccClassMult.new_middle || 1),
-                rural:       0.90 * (Q.peoples_party === 1 ? 0.87 : 1) * (ccClassMult.rural || 1),
-                unemployedc: 0.20 * (Q.peoples_party === 1 ? 1.10 : 1) * (ccClassMult.unemployedc || 1),
+                rural:       0.80 * (Q.peoples_party === 1 ? 0.87 : 1) * (ccClassMult.rural || 1),
+                unemployedc: 0.10 * (Q.peoples_party === 1 ? 1.10 : 1) * (ccClassMult.unemployedc || 1),
             };
             return _applyQOL(base * (class_mods[c] || 1.0) * _classAdj('z', c), party, c);
         }
 
         case 'bvp': {
             if (Q.bvp_banned) return 0;
-            let cath = Q.catholics * 0.20;
+            let cath = Q.catholics * 0.10;
             let rur  = Q.rural    * 0.03;
-            base = Math.min(6, rep * 2.01 * (nat * 3.1) * im.bvp + cath + rur);
+            base = Math.min(3, rep * 1.85 * (nat * 3.1) * im.bvp + cath + rur);
             base *= _partyAdj('bvp');
             base *= _campaignMult('bvp', c);
 
             let rural_m = 1.20 * (1 + Math.min(Q.rural / 125, 0.25)) * (Q.peoples_party === 1 ? 0.96 : 1);
             const class_mods = {
-                workers:     0.15 * (Q.peoples_party === 1 ? 0.94 : 1),
-                old_middle:  1.25 * (Q.peoples_party === 1 ? 0.96 : 1),
-                new_middle:  0.70 * (Q.peoples_party === 1 ? 0.96 : 1),
+                workers:     0.20 * (Q.peoples_party === 1 ? 0.94 : 1),
+                old_middle:  1.20 * (Q.peoples_party === 1 ? 0.96 : 1),
+                new_middle:  0.50 * (Q.peoples_party === 1 ? 0.96 : 1),
                 rural:       rural_m,
                 unemployedc: 0.05 * (Q.peoples_party === 1 ? 0.94 : 1),
             };
