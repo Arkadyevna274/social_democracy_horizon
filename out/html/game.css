@@ -462,13 +462,22 @@ body.dark-mode .stats-box {
   clear: left;
 }
 
-#content h1:first-child {
+#content h1:first-child,
+#content h2:first-child,
+#content h3:first-child,
+#content h4:first-child,
+#content h5:first-child,
+#content h6:first-child {
   margin-top: 0.5em;
 }
 
-#content h1 {
+#content h1,
+#content h2,
+#content h3,
+#content h4,
+#content h5,
+#content h6 {
   margin: 2em 0 1em 0;
-  font-size: 1.35em;
   font-weight: normal;
   text-align: center;
   text-transform: uppercase;
@@ -476,11 +485,12 @@ body.dark-mode .stats-box {
   text-shadow: rgba(255,255,255,0.75) 2px 2px 2px, rgba(0,0,0,0.1) -1px -1px 2px;
 }
 
-#content h2 {
-  margin: 1.5em 0 0.75em 0;
-  font-size: 1.2em;
-  font-weight: normal;
-}
+#content h1 { font-size: 1.35em; }
+#content h2 { font-size: 1.2em; }
+#content h3 { font-size: 1.1em; }
+#content h4 { font-size: 1.05em; }
+#content h5 { font-size: 1em; }
+#content h6 { font-size: 0.95em; }
 
 a {
   color: var(--link-color);
