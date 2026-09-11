@@ -25,6 +25,13 @@ Herein contains relevant information about the government and politics of the Ge
 
 @l
 on-display: {!
+var partyColors = {
+    SPD: "#E3000F", Z: "#000000", BVP: "#69A2BE", KPD: "#8B0000",
+    DDP: "#DCCA4A", DStP: "#DCCA4A", DVP: "#D5AC27", DNVP: "#3f7bc1",
+    NSDAP: "#954B00", WP: "#424242", CNBL: "#5D4E37", CSVD: "#3f7bc1",
+    SAPD: "#C40000", SRPD: "#FF6B6B", Independent: "#888888"
+};
+
 // Build chancellor/president tenure spans from leadership_records for timeline charts
 function buildTenureSpans(records, personKey, partyKey) {
     if (!records || records.length === 0) return [];
@@ -45,8 +52,6 @@ function buildTenureSpans(records, personKey, partyKey) {
         }
     }
     if (current) {
-        current.end = Q.leadership_records[Q.leadership_records.length - 1].date;
-        // extend last span to "now" using latest record date plus a bit, or today
         var lastDate = records[records.length - 1].date;
         current.end = new Date(lastDate.getFullYear(), lastDate.getMonth() + 1, lastDate.getDate());
         spans.push(current);
@@ -56,13 +61,21 @@ function buildTenureSpans(records, personKey, partyKey) {
 
 function renderTenureTimeline(svgId, spans, partyColorMap) {
     var svgEl = document.getElementById(svgId);
-    if (!svgEl || spans.length === 0) return;
+    if (!svgEl) {
+        console.log('renderTenureTimeline: no element found for', svgId);
+        return;
+    }
+    if (spans.length === 0) {
+        console.log('renderTenureTimeline: no spans for', svgId);
+        return;
+    }
 
     var margin = { top: 20, right: 20, bottom: 30, left: 20 };
     var width = 500 - margin.left - margin.right;
     var height = Math.max(80, spans.length * 36) - margin.top - margin.bottom;
 
-    var screenWidth = document.getElementById('content').offsetWidth;
+    var contentEl = document.getElementById('content');
+    var screenWidth = contentEl ? contentEl.offsetWidth : 500;
     if (screenWidth < 550) {
         width = screenWidth - 50 - margin.left - margin.right;
     }
@@ -117,13 +130,18 @@ function renderTenureTimeline(svgId, spans, partyColorMap) {
         .call(xAxis);
 }
 
+console.log('leadership_records:', Q.leadership_records);
+
 if (Q.leadership_records && Q.leadership_records.length > 0) {
     var chancellorSpans = buildTenureSpans(Q.leadership_records, 'chancellor', 'chancellor_party');
     var presidentSpans = buildTenureSpans(Q.leadership_records, 'president', 'president_party');
+    console.log('chancellorSpans:', chancellorSpans);
+    console.log('presidentSpans:', presidentSpans);
     renderTenureTimeline("chancellor_history", chancellorSpans, partyColors);
     renderTenureTimeline("president_history", presidentSpans, partyColors);
+} else {
+    console.log('No leadership_records — nothing to render.');
 }
-
 !}
 go-to: menu
 
