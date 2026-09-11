@@ -18,9 +18,136 @@ Herein contains relevant information about the government and politics of the Ge
 - @paramilitaries: Paramilitary groups
 - @factions: Internal factions
 - @figures: Figures and charts
+- @l: Leadership
 - @sandboxer: Sandbox? Okay.
 - @unsandboxer: Sandbox? No.
 - @backSpecialScene: Exit library.
+
+@l
+on-display: {!
+// Build chancellor/president tenure spans from leadership_records for timeline charts
+function buildTenureSpans(records, personKey, partyKey) {
+    if (!records || records.length === 0) return [];
+    var spans = [];
+    var current = null;
+    for (var i = 0; i < records.length; i++) {
+        var rec = records[i];
+        if (!current || current.person !== rec[personKey]) {
+            if (current) {
+                current.end = rec.date;
+                spans.push(current);
+            }
+            current = {
+                person: rec[personKey],
+                party: rec[partyKey],
+                start: rec.date
+            };
+        }
+    }
+    if (current) {
+        current.end = Q.leadership_records[Q.leadership_records.length - 1].date;
+        // extend last span to "now" using latest record date plus a bit, or today
+        var lastDate = records[records.length - 1].date;
+        current.end = new Date(lastDate.getFullYear(), lastDate.getMonth() + 1, lastDate.getDate());
+        spans.push(current);
+    }
+    return spans;
+}
+
+function renderTenureTimeline(svgId, spans, partyColorMap) {
+    var svgEl = document.getElementById(svgId);
+    if (!svgEl || spans.length === 0) return;
+
+    var margin = { top: 20, right: 20, bottom: 30, left: 20 };
+    var width = 500 - margin.left - margin.right;
+    var height = Math.max(80, spans.length * 36) - margin.top - margin.bottom;
+
+    var screenWidth = document.getElementById('content').offsetWidth;
+    if (screenWidth < 550) {
+        width = screenWidth - 50 - margin.left - margin.right;
+    }
+
+    d3.select(svgEl).selectAll("*").remove();
+    d3.select(svgEl)
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom);
+
+    var svg = d3.select(svgEl)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var allDates = spans.reduce(function(acc, s) {
+        acc.push(s.start, s.end);
+        return acc;
+    }, []);
+
+    var xScale = d3.scaleTime()
+        .domain([d3.min(allDates), d3.max(allDates)])
+        .range([0, width]);
+
+    var barHeight = 24;
+    var rowGap = 12;
+
+    svg.selectAll("rect")
+        .data(spans)
+        .enter()
+        .append("rect")
+        .attr("x", function(d) { return xScale(d.start); })
+        .attr("y", function(d, i) { return i * (barHeight + rowGap); })
+        .attr("width", function(d) { return Math.max(2, xScale(d.end) - xScale(d.start)); })
+        .attr("height", barHeight)
+        .attr("fill", function(d) { return (partyColorMap && partyColorMap[d.party]) || "#888888"; })
+        .attr("stroke", "#333")
+        .attr("stroke-width", 0.5);
+
+    svg.selectAll("text.tenure-label")
+        .data(spans)
+        .enter()
+        .append("text")
+        .attr("class", "tenure-label")
+        .attr("x", function(d) { return xScale(d.start) + 4; })
+        .attr("y", function(d, i) { return i * (barHeight + rowGap) + barHeight / 2 + 4; })
+        .attr("font-size", "11px")
+        .attr("fill", "#fff")
+        .text(function(d) { return d.person + (d.party ? " (" + d.party + ")" : ""); });
+
+    var xAxis = d3.axisBottom(xScale).ticks(6).tickFormat(d3.timeFormat("%Y"));
+    svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+}
+
+if (Q.leadership_records && Q.leadership_records.length > 0) {
+    var chancellorSpans = buildTenureSpans(Q.leadership_records, 'chancellor', 'chancellor_party');
+    var presidentSpans = buildTenureSpans(Q.leadership_records, 'president', 'president_party');
+    renderTenureTimeline("chancellor_history", chancellorSpans, partyColors);
+    renderTenureTimeline("president_history", presidentSpans, partyColors);
+}
+
+!}
+go-to: menu
+
+= Chancellor history
+
+[? if historical_mode: Not available in historical mode. ?]
+
+{!<svg id="chancellor_history" style="width: 500px;"> </svg>!}
+
+= President history
+
+[? if historical_mode: Not available in historical mode. ?]
+
+{!<svg id="president_history" style="width: 500px;"> </svg>!}
+
+
+
+
+
+
+
+
+
+
 
 @sandboxer
 on-arrival: sandbox = 1
@@ -515,55 +642,6 @@ if (d3 && window) {
     lines_3.width(width).height(300);
     d3.select("#economic_history").datum(Q.economic_records).call(lines_3);
 }
-
-function buildTimelineSegments(records, personKey, partyKey, nowDate) {
-    if (!records || records.length === 0) return [];
-    var segments = [];
-    var current = null;
-    records.forEach(function(rec) {
-        var name = rec[personKey];
-        var party = rec[partyKey];
-        if (!current || current.name !== name) {
-            if (current) current.end = rec.date;
-            current = { name: name, party: party, start: rec.date, end: null };
-            segments.push(current);
-        }
-    });
-    if (current) current.end = nowDate;
-    return segments;
-}
-
-function buildLeadershipTimelineHTML(segments, partyColors, partyLabels) {
-    if (!segments || segments.length === 0) return '<p>No data yet.</p>';
-    var maxSpan = segments.reduce(function(sum, s) {
-        return sum + (s.end - s.start);
-    }, 0);
-    if (maxSpan <= 0) maxSpan = 1;
-
-    var rows = segments.map(function(s) {
-        var widthPct = Math.max(2, ((s.end - s.start) / maxSpan) * 100);
-        var color = partyColors[s.party] || '#a0a0a0';
-        var startStr = s.start.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'});
-        var endStr = s.end.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'});
-        return '<div style="display:flex; align-items:center; margin-bottom:4px;">' +
-            '<div style="background-color:' + color + '; width:' + widthPct + '%; min-width:20px; height:24px; margin-right:8px;"></div>' +
-            '<span>' + s.name + ' (' + (partyLabels[s.party] || s.party) + ') — ' + startStr + ' to ' + endStr + '</span>' +
-            '</div>';
-    }).join('');
-
-    return '<div>' + rows + '</div>';
-}
-
-var _now_date = new Date(Q.year, Q.month - 1, Q.weeks === 0 ? 1 : 15);
-
-Q.chancellor_timeline = buildTimelineSegments(Q.leadership_records, 'chancellor', 'chancellor_party', _now_date);
-Q.president_timeline = buildTimelineSegments(Q.leadership_records, 'president', 'president_party', _now_date);
-
-Q.chancellor_timeline_html = buildLeadershipTimelineHTML(Q.chancellor_timeline, partyColors, partyLabels);
-Q.president_timeline_html = buildLeadershipTimelineHTML(Q.president_timeline, partyColors, partyLabels);
-
-document.getElementById('chancellor-timeline').innerHTML = Q.chancellor_timeline_html;
-document.getElementById('president-timeline').innerHTML = Q.president_timeline_html;
 !}
 
 = Reichstag composition
