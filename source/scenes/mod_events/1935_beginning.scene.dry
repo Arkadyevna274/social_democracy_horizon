@@ -1,5 +1,5 @@
 title: 1935
-subtitle: A newer year
+subtitle: Last year of this old world
 tags: event
 priority: -1
 max-visits: 1
@@ -8,7 +8,7 @@ on-arrival: return_to_normalcy = 0; nsdap_reformation = 1 if nsdap_votes < 5; ns
 
 = New Year
 
-New year has sunrised upon us. New age awaits us. And with the new age, issues and trends are starting to change. Perhaps, new beginning.
+New year has sunrised upon us. New age awaits us. And if the new age comes, issues and trends will start to change.
 
 [? if eu = 1: European Union has been commissionned with forming new fundament for the European Unification Process. ?]
 
@@ -17,3 +17,6 @@ New year has sunrised upon us. New age awaits us. And with the new age, issues a
 [? if young_catastrophy >= 1: We are beginning re-negotiations regarding Ruhr and Saar states after France re-occupied Ruhr unlawfully. ?]
 
 [? if nsdap_reformation = 1: Following catastrophy of NSDAP, Hitler has been ousted from his position by Strasser, receiving support from disillusioned Hitlerist National Socialists, Rohm's SA and Beefstake National Socialists. Gregor Strasser has assumed power and has invited Otto Strasser back. ?] 
+
+
+
