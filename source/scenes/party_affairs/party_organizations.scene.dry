@@ -34,6 +34,7 @@ on-arrival: {!
     Q.agricultural_assist += 1;
     if (Q.landvolk_fury > 0) { Q.landvolk_suppress += 1; }
     Q.reformist_dissent += (Q.peoples_party === 1) ? 2 : 5;
+    Q.rural += 0.10;
 !}
 
 We have assisted the agricultural sector, most neglected by the previous government. [? if year >= 1928: This is especially in the wake of agricultural revolts and protests caused by the Landvolkbewegung and multiple decentralized organizations. ?]
@@ -64,6 +65,8 @@ on-arrival: {!
         Q.addEventNudge('workers', 'spd', 3);
         Q.addEventNudge('unemployedc', 'spd', 3);
     }
+    Q.unemployed -= 0.1;
+    Q.workers += 0.10;
 !}
 
 We have increased funding to Workers' Welfare. [? if black_thursday_seen > 0 : In an age of economic crisis, this will be helpful for improving our standing among the unemployed. ?]
