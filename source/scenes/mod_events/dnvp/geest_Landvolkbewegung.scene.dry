@@ -8,17 +8,17 @@ on-arrival: {!
     Q.tariffs <= 0,
     Q.agricultural_policy <= 0,
     Q.unemployedc >= 5.8,
-    Q.rural_dnvp_display >= 36.6,
-    Q.sh_strength >= 600,
+    Q.rural_dnvp_pct >= 36.6,
+    Q.sh_strength >= 700,
     Q.pro_republic <= 53,
-    Q.nationalism > 21,
+    Q.nationalism > 24,
     Q.socialism > 20,
-    Q.rural_z_display > 13.3,
+    Q.rural_z_pct > 10,
     Q.local_rally > 0,
     Q.dnvp_relation > 25,
     Q.z_relation > 60,
     Q.ideology == "reformist",
-    Q.rural > 21.30,
+    Q.rural > 20.40,
   ];
  
 Q.landvolk_fury = conditions.filter(Boolean).length;
