@@ -30,6 +30,7 @@ for (var c of Q.classes) {
 @want
 subtitle: Alrighty. If you notice any bugs, report me, but anything impacted by sandbox is very likely not worth reporting it.
 on-arrival: game_over = 0; sandbox = 1
+view-if: developer_mode = 1
 go-to: post_event
 
 @hitler_wins
