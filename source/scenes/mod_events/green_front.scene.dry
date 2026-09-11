@@ -95,7 +95,7 @@ if (Q.cnbl_pct < 1.9 || Q.cnbl_r < 2.7) {
     Q.green_front_formation_points += 1;
 }
 
-if (Q.dbp_joins_gf >= 1 && Q.rlb_party_leader == "Karl Hepp" && Q.cnbl_crisis >= 1 && Q.green_front_formation_points >= 6) {
+if (Q.dbp_joins_gf >= 1 && Q.rlb_party_leader == "Karl Hepp" && Q.cnbl_crisis >= 1 && Q.green_front_formation_points >= 5) {
     this.achieve('gesamtlandliche_vertretung')
 }
 
